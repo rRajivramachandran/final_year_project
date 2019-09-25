@@ -1,20 +1,40 @@
 
 
-
 close all;
 clc;
-addpath('/home/rajiv/Desktop/fyp/RABBANI DATASET/AMD Part1/AMD (1).E2E/2- 25- 2017 9- 10- 42 PM')
-img = imread('Image 2.TIFF');
-a1=img(:,:);
-a = double(a1)/255; % Normalized Image
-c = 1; % Constant
-f = c*log(1 + (a)); % Log Transform
-subplot(1,3,1),imshow(a1),title('Original Image');
-subplot(1,3,2),imshow((f)),title('Log Transformation Image');
-T=tic;
-res = bayesEstimateDenoise(f);
-a=toc(T);
-subplot(1,3,3),imshow(res),title('final img');
+pat='/home/rajiv/Desktop/fyp/RABBANI DATASET/';
+subpath='DME/DME (2).E2E/2- 25- 2017 9- 36- 04 PM';
+addpath(pat);
+path=dir(pat);
+for i=3:length(path)
+    for j=3:length(dir(path(i).name))
+        lvl1=dir(pat+'dirty data/'+path(i).name)
+        lvl1=lvl1(j)
+        for k=3:length(lvl1.name)
+            lvl2=dir(pat+'dirty data/'+path(i).name+'/'+lvl1(j).name)
+            lvl2=lvl2(k)
+            for q=3:length(lvl2.name)
+                lvl3=dir(pat+'dirty data/'+path(i).name+'/'+lvl1(j).name+'/'+lvl2(j).name)
+                lvl3=lvl3(q)
+                for p=3:length(lvl3.name)
+                    img=imread(pat+'dirty data/'+path(i).name+'/'+lvl1(j).name+'/'+lvl2(j).name+'/'+lvl3(p).name);
+                    a1=img(:,:);
+                    a = double(a1)/255; % Normalized Image
+                    c = 1; % Constant
+                    f = c*log(1 + (a)); % Log Transform
+                    figure()
+                    subplot(1,3,1),imshow(a1),title('Original Image');
+                    subplot(1,3,2),imshow((f)),title('Log Transformation Image');
+                    T=tic;
+                    res = bayesEstimateDenoise(f);
+                    a=toc(T);
+                    subplot(1,3,3),imshow(res),title('final img');
+                    imwrite(res,pat+'clean data/'+path(i).name+'/'+lvl1(j).name+'/'+lvl2(j).name+'/'+lvl3(p).name);
+                end
+            end
+        end
+    end
+end
 
 
 function res = bayesEstimateDenoise(img, varargin)
@@ -190,16 +210,3 @@ for i = 1:size(img,1)
 end
 end
 
-function [ ratio ] = estimatePar( img )
-%ESTIMATEPAR estimates the constant ratio between the standard deviation
-%and mean of homogeneous regions in OCT data
-
-
-% select a homogeneous area
-
-region = img;
-
-ratio = std(region(:),1)/mean(region(:));
-
-
-end
